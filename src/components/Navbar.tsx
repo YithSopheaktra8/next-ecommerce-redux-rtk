@@ -9,24 +9,22 @@ import {
 	Link,
 	Button,
 	NavbarMenuToggle,
-    NavbarMenu,
-    NavbarMenuItem,
+	NavbarMenu,
+	NavbarMenuItem,
 } from "@nextui-org/react";
 import { AcmeLogo } from "./AcemeLogo";
+import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 export default function App() {
+	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
 	const menuItems = [
-		"Profile",
-		"Dashboard",
-		"Activity",
-		"Analytics",
-		"System",
-		"Deployments",
-		"My Settings",
-		"Team Settings",
-		"Help & Feedback",
+		"Home",
+        "About",
+        "Policy",
+        "My Shop",
 		"Log Out",
 	];
 	return (
@@ -45,23 +43,23 @@ export default function App() {
 				</NavbarBrand>
 			</NavbarContent>
 			<NavbarContent className="hidden sm:flex gap-4" justify="center">
-				<NavbarItem>
-					<Link color="foreground" href="#">
+				<NavbarItem isActive={pathName === "/"}>
+					<Link color="foreground" href="/">
 						Home
 					</Link>
 				</NavbarItem>
-				<NavbarItem isActive>
-					<Link href="#" aria-current="page">
+				<NavbarItem isActive={pathName === "/about"}>
+					<Link color="foreground" href="/about">
 						About Us
 					</Link>
 				</NavbarItem>
-				<NavbarItem>
-					<Link color="foreground" href="#">
+				<NavbarItem isActive={pathName === "/policy"}>
+					<Link color="foreground" href="/policy">
 						Policy
 					</Link>
 				</NavbarItem>
-				<NavbarItem>
-					<Link color="foreground" href="#">
+				<NavbarItem isActive={pathName === "/myshop"}>
+					<Link color="foreground" href="/myshop">
 						My Shop
 					</Link>
 				</NavbarItem>
@@ -85,7 +83,7 @@ export default function App() {
 									: "foreground"
 							}
 							className="w-full"
-							href="#"
+							href={`/${item.toLowerCase().replace(" ", "")}`}
 							size="lg">
 							{item}
 						</Link>

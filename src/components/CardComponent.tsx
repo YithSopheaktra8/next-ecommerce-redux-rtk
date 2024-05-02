@@ -1,16 +1,14 @@
-import Image from "next/image";
+import NextImage from "next/image";
+import { Image } from "@nextui-org/react";
+
 import { ProductType } from "@/types/productType";
 import { useAppDispatch } from "@/redux/hook";
 import { addToCart } from "@/redux/features/cart/cartSlice";
 
-export default function CardComponent({
-	title,
-	price,
-	image,
-	description,
-	id,
-}: ProductType, { isLoading }: { isLoading: boolean }) {
-
+export default function CardComponent(
+	{ title, price, image, description, id }: ProductType,
+	{ isLoading }: { isLoading: boolean }
+) {
 	const dispatch = useAppDispatch();
 
 	return (
@@ -18,12 +16,14 @@ export default function CardComponent({
 			<article className="max-w-sm w-full h-full bg-white rounded-lg shadow-lg overflow-hidden dark:bg-gray-700">
 				<div>
 					<Image
-						className="object-cover h-64 w-full transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 transform duration-300"
+						as={NextImage}
+						className="object-cover h-64 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-105 transform duration-300"
 						src={image}
 						alt={title}
-						draggable="false"
-						width={250}
+						width={450}
 						height={250}
+						loading="eager"
+						isBlurred
 					/>
 				</div>
 
@@ -32,7 +32,7 @@ export default function CardComponent({
 						{title}
 					</h2>
 					<span className="font-normal text-gray-600 dark:text-gray-300 line-clamp-1">
-						{description? description : "No description"}
+						{description ? description : "No description"}
 					</span>
 					<span className="font-semibold text-gray-800 dark:text-gray-50">
 						${price}
@@ -40,8 +40,11 @@ export default function CardComponent({
 				</div>
 
 				<div className="mt-4 p-4 border-t border-gray-200 dark:border-gray-500">
-					<button className="w-full flex justify-between items-center font-bold cursor-pointer hover:underline text-gray-800 dark:text-gray-50"
-					onClick={()=>dispatch(addToCart({id,image,title,price}))}>
+					<button
+						className="w-full flex justify-between items-center font-bold cursor-pointer hover:underline text-gray-800 dark:text-gray-50"
+						onClick={() =>
+							dispatch(addToCart({ id, image, title, price }))
+						}>
 						<span className="text-base">Add to Cart</span>
 						<svg
 							className="h-6 w-6"

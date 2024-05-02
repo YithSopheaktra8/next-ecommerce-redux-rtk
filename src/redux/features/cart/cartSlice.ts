@@ -49,11 +49,14 @@ const cartSlice = createSlice({
 			const price = product?.price || 0;
 			state.totalPrice -= parseFloat(price.toString());
 		},
+        addPrice: (state, action: PayloadAction<number>) => {
+            state.totalPrice += action.payload;
+        }
 	},
 });
 
 // export actions
-export const { addToCart, removeFromCart, increment, decrement } =
+export const { addToCart, removeFromCart, increment, decrement, addPrice } =
 	cartSlice.actions;
 export default cartSlice.reducer;
 

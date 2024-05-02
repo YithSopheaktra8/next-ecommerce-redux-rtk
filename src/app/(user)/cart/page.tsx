@@ -3,16 +3,16 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import ProductCart from "@/components/ProductCart";
-import { Button } from "@nextui-org/button";
+import { addPrice} from "@/redux/features/cart/cartSlice";
 
 export default function Cart() {
+    const dispatch = useAppDispatch();
 	const ShippingTax = 65;
 	const products = useAppSelector((state) => state.cart.products);
 	const subTotalPrice = useAppSelector((state) => state.cart.totalPrice);
-	const totalPrice =
-		useAppSelector((state) => state.cart.totalPrice) - ShippingTax;
+	const totalPrice = subTotalPrice + ShippingTax;
 	const route = useRouter();
 
 	return (
@@ -86,7 +86,7 @@ export default function Cart() {
 											$
 											{products.length === 0
 												? 0
-												: subTotalPrice}
+												: subTotalPrice.toFixed(2)}
 										</p>
 									</div>
 									<div className="flex items-center justify-between pt-5">
@@ -94,7 +94,7 @@ export default function Cart() {
 											Shipping
 										</p>
 										<p className="text-base leading-none text-gray-800">
-											$30
+											$30.00
 										</p>
 									</div>
 									<div className="flex items-center justify-between pt-5">
@@ -102,7 +102,7 @@ export default function Cart() {
 											Tax
 										</p>
 										<p className="text-base leading-none text-gray-800">
-											$35
+											$35.00
 										</p>
 									</div>
 								</div>
@@ -114,7 +114,7 @@ export default function Cart() {
 										<p className="text-2xl font-bold leading-normal text-right text-gray-800">
 											$
 											{products.length === 0
-												? 0
+												? 0.00
 												: totalPrice}
 										</p>
 									</div>

@@ -17,8 +17,10 @@ import { AcmeLogo } from "./AcemeLogo";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useAppSelector } from "@/redux/hook";
+import { useSession } from "next-auth/react";
 
 export default function App() {
+	const session = useSession();
 	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 	const menuItems = ["Home", "About", "Policy", "My Shop", "Log Out"];
@@ -26,6 +28,7 @@ export default function App() {
 
 	const cart = useAppSelector((state) => state.cart.products);
 	let cartLength = cart.length;
+	console.log(session);
 
 	return (
 		<Navbar
@@ -58,8 +61,8 @@ export default function App() {
 						Policy
 					</Link>
 				</NavbarItem>
-				<NavbarItem isActive={pathName === "/myshop"}>
-					<Link color="foreground" href="/myshop">
+				<NavbarItem isActive={pathName === "/dashboard"}>
+					<Link color="foreground" href="/dashboard">
 						My Shop
 					</Link>
 				</NavbarItem>
@@ -77,9 +80,24 @@ export default function App() {
 							{cartLength}
 						</span>
 					</button>
-					<Button as={Link} color="primary" href="#" variant="flat">
-						Login
-					</Button>
+					{session.status === "unauthenticated" ? (
+						<Button
+							as={Link}
+							color="primary"
+							href="/login"
+							variant="flat">
+							Login
+						</Button>
+					) : (
+						<Image 
+							src={session.data?.user?.image as string || "/user.png"}
+							alt="profile"
+							width={45}
+							height={45}
+							objectFit="cover"
+							className="rounded-full cursor-pointer"
+						/>
+					)}
 				</NavbarItem>
 			</NavbarContent>
 			<NavbarMenu>

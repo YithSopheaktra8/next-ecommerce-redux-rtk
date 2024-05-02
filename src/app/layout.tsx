@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import { roboto, suwannaphum } from "./font";
 import Footer from "@/components/Footer";
 import StoreProvider from "./storeProvider";
+import SessionWrapper from "./SessionWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,15 +22,17 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body className={`${suwannaphum.variable} ${roboto.variable}`}>
-				<StoreProvider>
-					<Providers>
-						<Navbar />
-						{children}
-						<Footer />
-					</Providers>
-				</StoreProvider>
-			</body>
+			<SessionWrapper>
+				<body className={`${suwannaphum.variable} ${roboto.variable}`}>
+					<StoreProvider>
+						<Providers>
+							<Navbar />
+							{children}
+							<Footer />
+						</Providers>
+					</StoreProvider>
+				</body>
+			</SessionWrapper>
 		</html>
 	);
 }

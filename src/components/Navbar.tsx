@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import {
 	Navbar,
 	NavbarBrand,
@@ -12,23 +12,55 @@ import {
 	NavbarMenuToggle,
 	NavbarMenu,
 	NavbarMenuItem,
+	Image,
+	DropdownTrigger,
+	Dropdown,
+	DropdownMenu,
+	DropdownItem,
+	Avatar,
+	User,
 } from "@nextui-org/react";
 import { AcmeLogo } from "./AcemeLogo";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useAppSelector } from "@/redux/hook";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 export default function App() {
 	const session = useSession();
 	const pathName = usePathname();
-	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-	const menuItems = ["Home", "About", "Policy", "My Shop", "Log Out"];
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const router = useRouter();
+
+	const menuItems = [
+		{
+			name: "Home",
+			path: "/",
+		},
+		{
+			name: "About",
+			path: "/about",
+		},
+		{
+			name: "Policy",
+			path: "/policy",
+		},
+		{
+			name: "My Shop",
+			path: "/dashboard",
+		},
+	];
 
 	const cart = useAppSelector((state) => state.cart.products);
 	let cartLength = cart.length;
-	console.log(session);
+
+	const handleSignout = async () => {
+		const isSignout = await signOut();
+		if (isSignout) {
+			signOut();
+			redirect("/login");
+		}
+	};
 
 	return (
 		<Navbar
@@ -89,14 +121,45 @@ export default function App() {
 							Login
 						</Button>
 					) : (
-						<Image 
-							src={session.data?.user?.image as string || "/user.png"}
-							alt="profile"
-							width={45}
-							height={45}
-							objectFit="cover"
-							className="rounded-full cursor-pointer"
-						/>
+						<div className="flex items-center gap-4">
+							<Dropdown placement="bottom-start">
+								<DropdownTrigger>
+									<User
+										as="button"
+										avatarProps={{
+											isBordered: true,
+											src: `${session.data?.user?.image}`,
+										}}
+										className="flex flex-col transition-transform md:flex-row"
+										description={session.data?.user?.name}
+										name={session.data?.user?.name}
+									/>
+								</DropdownTrigger>
+								<DropdownMenu
+									aria-label="User Actions"
+									variant="flat">
+									<DropdownItem
+										key="profile"
+										className="h-14 gap-2">
+										<p className="font-bold">
+											Signed in as
+										</p>
+										<p className="font-bold">
+											{session.data?.user?.email}
+										</p>
+									</DropdownItem>
+									<DropdownItem key="settings">
+										Dashboard
+									</DropdownItem>
+									<DropdownItem
+										key="logout"
+										color="danger"
+										onClick={() => handleSignout()}>
+										Log Out
+									</DropdownItem>
+								</DropdownMenu>
+							</Dropdown>
+						</div>
 					)}
 				</NavbarItem>
 			</NavbarContent>
@@ -112,9 +175,9 @@ export default function App() {
 									: "foreground"
 							}
 							className="w-full"
-							href={`/${item.toLowerCase().replace(" ", "")}`}
+							href={item.path}
 							size="lg">
-							{item}
+							{item.name}
 						</Link>
 					</NavbarMenuItem>
 				))}

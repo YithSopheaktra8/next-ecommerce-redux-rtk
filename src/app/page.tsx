@@ -6,13 +6,10 @@ import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
 import { testimonials } from "@/lib/testimonals";
 import CardComponent from "@/components/CardComponent";
 import { useGetProductsQuery } from "@/redux/service/products";
-import { ProductType } from "@/types/productType";
 import { useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
-import LoadingComponent from "@/components/LoadingComponent";
 import { useAppSelector } from "@/redux/hook";
-import PlaceholderComponent from "@/components/PlaceholderComponent";
 
 export default function Home() {
 	const [currentPage, setCurrentPage] = useState(1);
@@ -24,8 +21,6 @@ export default function Home() {
 	});
 	const totalPages = data?.total;
 
-	const cart = useAppSelector((state) => state.cart.products);
-	console.log(cart);
 
 	// if (isLoading) return <LoadingComponent />;
 
@@ -193,7 +188,11 @@ export default function Home() {
 							key={product.id}
 							title={product.name}
 							description={product.desc}
-							image={product.image === "" ? "https://agrimart.in/uploads/vendor_banner_image/default.jpg" : product.image}
+							image={
+								product.image === ""
+									? "https://agrimart.in/uploads/vendor_banner_image/default.jpg"
+									: product.image
+							}
 							price={product.price}
 							id={product.id}
 						/>

@@ -1,6 +1,14 @@
+"use client";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function Footer() {
+	const pathName = usePathname();
+	console.log(pathName);
+	if (pathName === "/login" || pathName === "/register") {
+		return "";
+	}
+
 	return (
 		<footer className="mx-auto container xl:px-20 lg:px-12 sm:px-6 px-4 px-4 py-12">
 			<div className="flex flex-col items-center justify-center">

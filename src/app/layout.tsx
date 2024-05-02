@@ -3,8 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
-import {  roboto, suwannaphum } from "./font";
+import { roboto, suwannaphum } from "./font";
 import Footer from "@/components/Footer";
+import StoreProvider from "./storeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +22,13 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${suwannaphum.variable} ${roboto.variable}`}>
-				<Providers>
-					<Navbar />
-					{children}
-          <Footer />
-				</Providers>
+				<StoreProvider>
+					<Providers>
+						<Navbar />
+						{children}
+						<Footer />
+					</Providers>
+				</StoreProvider>
 			</body>
 		</html>
 	);

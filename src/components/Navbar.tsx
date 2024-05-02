@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
 	Navbar,
 	NavbarBrand,
@@ -13,20 +14,19 @@ import {
 	NavbarMenuItem,
 } from "@nextui-org/react";
 import { AcmeLogo } from "./AcemeLogo";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { useAppSelector } from "@/redux/hook";
 
 export default function App() {
 	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+	const menuItems = ["Home", "About", "Policy", "My Shop", "Log Out"];
+	const router = useRouter();
 
-	const menuItems = [
-		"Home",
-        "About",
-        "Policy",
-        "My Shop",
-		"Log Out",
-	];
+	const cart = useAppSelector((state) => state.cart.products);
+	let cartLength = cart.length;
+
 	return (
 		<Navbar
 			shouldHideOnScroll
@@ -39,7 +39,7 @@ export default function App() {
 				/>
 				<NavbarBrand>
 					<AcmeLogo />
-					<p className="font-bold text-inherit">ACME</p>
+					<p className="font-bold text-inherit">I-SHOP</p>
 				</NavbarBrand>
 			</NavbarContent>
 			<NavbarContent className="hidden sm:flex gap-4" justify="center">
@@ -65,9 +65,20 @@ export default function App() {
 				</NavbarItem>
 			</NavbarContent>
 			<NavbarContent justify="end">
-				<NavbarItem>
+				<NavbarItem className="flex items-center gap-5">
+					<button onClick={() => router.push("/cart")}>
+						<Image
+							src="/icons/cart.png"
+							alt="backgroud"
+							width={30}
+							height={30}
+						/>
+						<span className="self-center grid place-content-center whitespace-nowrap text-medium font-medium text-white bg-black w-[25px] h-[25px] rounded-full absolute top-1 ml-5">
+							{cartLength}
+						</span>
+					</button>
 					<Button as={Link} color="primary" href="#" variant="flat">
-						Sign Up
+						Login
 					</Button>
 				</NavbarItem>
 			</NavbarContent>

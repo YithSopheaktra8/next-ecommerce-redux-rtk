@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Navbar,
 	NavbarBrand,
@@ -23,14 +23,19 @@ import {
 import { AcmeLogo } from "./AcemeLogo";
 import { redirect, useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { useAppSelector } from "@/redux/hook";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { signOut, useSession } from "next-auth/react";
+import { clearAccessToken } from "@/redux/features/token/tokenSlice";
 
 export default function App() {
+	const dispatch = useAppDispatch();
 	const session = useSession();
 	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const router = useRouter();
+	const accessToken = useAppSelector((state) => state.accessToken.token);
+
+
 
 	const menuItems = [
 		{
@@ -60,6 +65,23 @@ export default function App() {
 			signOut();
 			redirect("/login");
 		}
+	};
+
+	const handleLogout = async () => {
+		fetch(process.env.NEXT_PUBLIC_BASE_URL_LOCALHOST + "/logout", {
+			method: "POST",
+			credentials: "include",
+			body: JSON.stringify({}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				console.log("Response data from logout", data);
+			})
+			.catch((error) => {
+				console.error("Refresh Token error:", error);
+			});
+
+		dispatch(clearAccessToken());
 	};
 
 	return (
@@ -112,7 +134,7 @@ export default function App() {
 							{cartLength}
 						</span>
 					</button>
-					{session.status === "unauthenticated" ? (
+					{accessToken === null ? (
 						<Button
 							as={Link}
 							color="primary"
@@ -154,7 +176,11 @@ export default function App() {
 									<DropdownItem
 										key="logout"
 										color="danger"
-										onClick={() => handleSignout()}>
+										onClick={() => {
+											session.data === null
+												? handleLogout()
+												: handleSignout();
+										}}>
 										Log Out
 									</DropdownItem>
 								</DropdownMenu>

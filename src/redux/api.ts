@@ -7,6 +7,7 @@ const baseQuery = fetchBaseQuery({
 	baseUrl: process.env.NEXT_PUBLIC_DJANGO_API_URL,
 	prepareHeaders: (headers, { getState }) => {
 		const token = (getState() as RootState).accessToken.token;
+		console.log("token", token)
 		// if we have a token, let's set the authorization header
 		if (token) {
 			headers.set("authorization", `Bearer ${token}`);

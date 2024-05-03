@@ -15,7 +15,7 @@ export default function Home() {
 	const [currentPage, setCurrentPage] = useState(1);
 
 	const words = "Fitness kits that help you keep fit.";
-	const { data, error, isFetching, isLoading } = useGetProductsQuery({
+	const { data } = useGetProductsQuery({
 		page: currentPage,
 		pageSize: 8,
 	});

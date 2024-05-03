@@ -1,11 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Image } from "@nextui-org/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { FaEyeSlash, FaEye } from "react-icons/fa6";
+import { LoginRequest } from "@/types/userType";
+import { useAppDispatch } from "@/redux/hook";
+import { setAccessToken } from "@/redux/features/token/tokenSlice";
 
 type ValueTypes = {
 	email: string;
@@ -17,14 +21,49 @@ const initialValues: ValueTypes = {
 	password: "",
 };
 
+const validationSchema = Yup.object().shape({
+	email: Yup.string()
+		.email("Invalid email address")
+		.required("Email is required"),
+	password: Yup.string(),
+});
+
 export default function Login() {
 	const { data: session } = useSession();
-	console.log(session);
+	const [showPassword, setShowPassword] = useState(false);
+	const router = useRouter();
+	const dispatch = useAppDispatch();
+
 	// checking if sessions exists
 	if (session) {
 		// rendering components htmlFor logged in users
 		redirect("/");
 	}
+
+	const handleTogglePassword = () => {
+		setShowPassword(!showPassword);
+	};
+	const handleLogin = async (user: LoginRequest) => {
+		const { email, password } = user;
+		const data = await fetch(
+			process.env.NEXT_PUBLIC_BASE_URL_LOCALHOST + "login",
+			{
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ email, password }),
+			}
+		);
+		data.json().then((data) => {
+			console.log(data);
+			dispatch(setAccessToken(data.accessToken));
+		});
+
+		if (data.status === 200) {
+			router.push("/");
+		}
+	};
 
 	return (
 		<main className="flex h-screen">
@@ -335,41 +374,78 @@ export default function Login() {
 					<div className="mt-4 text-sm text-gray-600 text-center">
 						<p>or with email</p>
 					</div>
-					<form action="#" method="POST" className="space-y-4">
-						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-medium text-gray-700">
-								Email
-							</label>
-							<input
-								type="text"
-								id="email"
-								name="email"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
-							<label
-								htmlFor="password"
-								className="block text-sm font-medium text-gray-700">
-								Password
-							</label>
-							<input
-								type="password"
-								id="password"
-								name="password"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
+					<Formik
+						initialValues={initialValues}
+						validationSchema={validationSchema}
+						onSubmit={(value) => {
+							handleLogin(value);
+						}}>
+						<Form className="space-y-4">
+							<div>
+								<label
+									htmlFor="email"
+									className="block text-sm font-medium text-gray-700">
+									Email
+								</label>
+								<Field
+									type="text"
+									id="email"
+									name="email"
+									className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+								/>
+								<ErrorMessage
+									name="email"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
+							{/* password */}
+							<div>
+								<label
+									htmlFor="password"
+									className="block text-sm font-medium text-gray-700">
+									Password
+								</label>
+								<div className="relative">
+									<Field
+										type={
+											showPassword ? "text" : "password"
+										}
+										id="password"
+										name="password"
+										className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+									/>
+									{showPassword ? (
+										<FaEye
+											className="absolute right-0 top-4 right-2 cursor-pointer"
+											onClick={() =>
+												handleTogglePassword()
+											}
+										/>
+									) : (
+										<FaEyeSlash
+											className="absolute right-0 top-4 right-2 cursor-pointer"
+											onClick={() =>
+												handleTogglePassword()
+											}
+										/>
+									)}
+								</div>
+
+								<ErrorMessage
+									name="password"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
+							{/* button */}
 							<button
 								type="submit"
 								className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300">
 								Sign In
 							</button>
-						</div>
-					</form>
+						</Form>
+					</Formik>
 					{/* <div className="mt-4 text-sm text-gray-600 text-center">
 						<p>
 							Already have an account?{" "}

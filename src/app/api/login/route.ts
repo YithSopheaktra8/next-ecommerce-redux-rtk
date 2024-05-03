@@ -8,13 +8,14 @@ export async function POST(req: NextRequest) {
 
 	// Make a POST request to the Our API
 	const response = await fetch(
-		`${process.env.DJANGO_API_URL}/api/user/login/`,
+		`${process.env.NEXT_PUBLIC_DJANGO_API_URL}api/user/login/`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ email, password }),
 		}
 	);
+	console.log("status", response.status);
 	// If the request fails, return an error message to the client-side
 	if (!response.ok) {
 		return NextResponse.json(

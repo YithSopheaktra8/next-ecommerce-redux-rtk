@@ -18,7 +18,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 		// create a product
 		createProduct: builder.mutation<any, { newProduct: object }>({
 			query: ({ newProduct }) => ({
-				url: "/api/products/",
+				url: "api/products/",
 				method: "POST",
 				body: newProduct,
 			}),
@@ -30,7 +30,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 			{ id: number; updatedProduct: object }
 		>({
 			query: ({ id, updatedProduct }) => ({
-				url: `/api/products/${id}/`,
+				url: `api/products/${id}/`,
 				method: "PATCH",
 				body: updatedProduct,
 			}),
@@ -39,7 +39,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 		// delete a product
 		deleteProduct: builder.mutation<any, { id: number }>({
 			query: ({ id }) => ({
-				url: `/api/products/${id}/`,
+				url: `api/products/${id}/`,
 				method: "DELETE",
 			}),
 		}),

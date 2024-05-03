@@ -7,11 +7,6 @@ const nextConfig = {
 				hostname: "**",
 				pathname: "/**",
 			},
-			{
-				protocol: "https",
-				hostname: "fakestoreapi.com",
-				pathname: "/img/*",
-			},
 		],
 	},
 };

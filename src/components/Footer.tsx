@@ -4,7 +4,6 @@ import React from "react";
 
 export default function Footer() {
 	const pathName = usePathname();
-	console.log(pathName);
 	if (pathName === "/login" || pathName === "/register") {
 		return "";
 	}

@@ -26,16 +26,28 @@ import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { signOut, useSession } from "next-auth/react";
 import { clearAccessToken } from "@/redux/features/token/tokenSlice";
+import { cookies } from "next/headers";
+import { useUserProfileQuery } from "@/redux/service/auth";
+import {
+	selectAvatar,
+	selectBio,
+} from "@/redux/features/userProfile/userProfileSlice";
+import {
+	addUser,
+	fetchUserProfile,
+} from "@/redux/features/userProfile/userProfileSlice";
 
-export default function App() {
+export default function NavbarComponent() {
 	const dispatch = useAppDispatch();
 	const session = useSession();
 	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const router = useRouter();
-	const accessToken = useAppSelector((state) => state.accessToken.token);
+	const userAvatar = useAppSelector(selectAvatar);
+	const userBio = useAppSelector(selectBio);
+	const userProfile = useAppSelector((state) => state.userProfile);
 
-
+	console.log("User Profile", userProfile);
 
 	const menuItems = [
 		{
@@ -63,7 +75,7 @@ export default function App() {
 		const isSignout = await signOut();
 		if (isSignout) {
 			signOut();
-			redirect("/login");
+			router.push("/login");
 		}
 	};
 
@@ -80,8 +92,8 @@ export default function App() {
 			.catch((error) => {
 				console.error("Refresh Token error:", error);
 			});
-
 		dispatch(clearAccessToken());
+		router.push("/login");
 	};
 
 	return (
@@ -134,15 +146,7 @@ export default function App() {
 							{cartLength}
 						</span>
 					</button>
-					{accessToken === null ? (
-						<Button
-							as={Link}
-							color="primary"
-							href="/login"
-							variant="flat">
-							Login
-						</Button>
-					) : (
+					{true ? (
 						<div className="flex items-center gap-4">
 							<Dropdown placement="bottom-start">
 								<DropdownTrigger>
@@ -150,11 +154,23 @@ export default function App() {
 										as="button"
 										avatarProps={{
 											isBordered: true,
-											src: `${session.data?.user?.image}`,
+											src: `${
+												session.data === null
+													? userAvatar
+													: session.data?.user?.image
+											}`,
 										}}
 										className="flex flex-col transition-transform md:flex-row"
-										description={session.data?.user?.name}
-										name={session.data?.user?.name}
+										description={
+											session.data === null
+												? userBio
+												: session.data?.user?.name
+										}
+										name={
+											session.data === null
+												? ""
+												: session.data?.user?.name
+										}
 									/>
 								</DropdownTrigger>
 								<DropdownMenu
@@ -167,11 +183,17 @@ export default function App() {
 											Signed in as
 										</p>
 										<p className="font-bold">
-											{session.data?.user?.email}
+											{session.data === null
+												? "User"
+												: session.data?.user?.email}
 										</p>
 									</DropdownItem>
-									<DropdownItem key="settings">
-										Dashboard
+									<DropdownItem
+										key="login"
+										onClick={() => {
+											router.push("/login");
+										}}>
+										Login
 									</DropdownItem>
 									<DropdownItem
 										key="logout"
@@ -186,6 +208,14 @@ export default function App() {
 								</DropdownMenu>
 							</Dropdown>
 						</div>
+					) : (
+						<Button
+							href="/login"
+							as={Link}
+							color="primary"
+							variant="flat">
+							Login
+						</Button>
 					)}
 				</NavbarItem>
 			</NavbarContent>

@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSession, signIn, signOut } from "next-auth/react";
@@ -8,8 +8,19 @@ import { Image } from "@nextui-org/react";
 import { redirect, useRouter } from "next/navigation";
 import { FaEyeSlash, FaEye } from "react-icons/fa6";
 import { LoginRequest } from "@/types/userType";
-import { useAppDispatch } from "@/redux/hook";
-import { setAccessToken } from "@/redux/features/token/tokenSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import {
+	setAccessToken,
+	clearAccessToken,
+} from "@/redux/features/token/tokenSlice";
+import {
+	addUser,
+	fetchUserProfile,
+} from "@/redux/features/userProfile/userProfileSlice";
+import {
+	selectAvatar,
+	selectBio,
+} from "@/redux/features/userProfile/userProfileSlice";
 
 type ValueTypes = {
 	email: string;
@@ -45,7 +56,7 @@ export default function Login() {
 	};
 	const handleLogin = async (user: LoginRequest) => {
 		const { email, password } = user;
-		const data = await fetch(
+		const res = await fetch(
 			process.env.NEXT_PUBLIC_BASE_URL_LOCALHOST + "login",
 			{
 				method: "POST",
@@ -55,15 +66,24 @@ export default function Login() {
 				body: JSON.stringify({ email, password }),
 			}
 		);
-		data.json().then((data) => {
-			console.log(data);
-			dispatch(setAccessToken(data.accessToken));
-		});
+		res.json()
+			.then((data) => {
+				dispatch(setAccessToken(data.accessToken));
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+			});
 
-		if (data.status === 200) {
+		if (res.status === 200) {
 			router.push("/");
 		}
 	};
+
+	// fetching user profile
+	useEffect(() => {
+		dispatch(fetchUserProfile());
+	}, []);
+
 
 	return (
 		<main className="flex h-screen">
@@ -357,7 +377,10 @@ export default function Login() {
 						</div>
 						<div className="w-full lg:w-1/2 ml-0 lg:ml-2">
 							<button
-								onClick={() => signIn("github")}
+								onClick={() => {
+									dispatch(clearAccessToken());
+									signIn("github");
+								}}
 								type="button"
 								className="w-full flex justify-center items-center gap-2 bg-white text-sm text-gray-600 p-2 rounded-md hover:bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors duration-300">
 								<svg

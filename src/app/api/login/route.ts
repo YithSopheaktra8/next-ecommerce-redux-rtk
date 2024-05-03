@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
 			body: JSON.stringify({ email, password }),
 		}
 	);
-	console.log("status", response.status);
 	// If the request fails, return an error message to the client-side
 	if (!response.ok) {
 		return NextResponse.json(

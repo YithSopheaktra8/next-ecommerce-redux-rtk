@@ -6,10 +6,7 @@ export const authApi = ecommerceApi.injectEndpoints({
 	endpoints: (builder) => ({
 		// user profile
 		userProfile: builder.query<any, {}>({
-			query: () => ({
-				url: "api/user/profile/",
-				method: "GET",
-			}),
+			query: () => "api/user/profile/",
 		}),
 	}),
 	overrideExisting: false, // don't override existing hooks

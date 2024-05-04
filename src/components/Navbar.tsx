@@ -47,8 +47,6 @@ export default function NavbarComponent() {
 	const userBio = useAppSelector(selectBio);
 	const userProfile = useAppSelector((state) => state.userProfile);
 
-	console.log("User Profile", userProfile);
-
 	const menuItems = [
 		{
 			name: "Home",
@@ -223,6 +221,7 @@ export default function NavbarComponent() {
 				{menuItems.map((item, index) => (
 					<NavbarMenuItem key={`${item}-${index}`}>
 						<Link
+
 							color={
 								index === 2
 									? "primary"
@@ -234,6 +233,7 @@ export default function NavbarComponent() {
 							href={item.path}
 							size="lg">
 							{item.name}
+						
 						</Link>
 					</NavbarMenuItem>
 				))}

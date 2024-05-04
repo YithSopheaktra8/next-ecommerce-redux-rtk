@@ -68,6 +68,7 @@ export default function Login() {
 		);
 		res.json()
 			.then((data) => {
+				console.log("Response data from login", data);
 				dispatch(setAccessToken(data.accessToken));
 			})
 			.catch((error) => {

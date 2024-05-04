@@ -18,13 +18,16 @@ type ProductType = {
 	price: number;
 	description: string;
 	image: string;
+	category : string;
 };
 
 type CartProductType = {
-	title: string;
-	image: string;
-	price: number;
 	id: number;
+	title: string;
+	price: number;
+	description: string;
+	image: string;
+	category : string;
 	onClick?: () => void;
 };
 

@@ -68,6 +68,7 @@ export default function Cart() {
 										image={product.image}
 										id={product.id}
 										description={product.title}
+										category="Coffee"
 									/>
 								))
 							)}

@@ -1,19 +1,24 @@
 import NextImage from "next/image";
 import { Card, CardBody, CardFooter, Image } from "@nextui-org/react";
 
-import { ProductType } from "@/types/productType";
+import { CartProductType } from "@/types/productType";
 import { useAppDispatch } from "@/redux/hook";
 import { addToCart } from "@/redux/features/cart/cartSlice";
 
-export default function CardComponent(
-	{ title, price, image, description, id }: ProductType,
-	{ isLoading }: { isLoading: boolean }
-) {
+export default function CardComponent({
+	title,
+	price,
+	image,
+	description,
+	id,
+	category,
+	onClick,
+}: CartProductType) {
 	const dispatch = useAppDispatch();
 
 	return (
 		<div className="w-full">
-			<Card shadow="sm" key={id} isPressable isBlurred isHoverable>
+			<Card shadow="sm" key={id} isPressable isBlurred isHoverable onClick={onClick}>
 				<CardBody className="overflow-visible p-0">
 					<Image
 						shadow="sm"
@@ -31,7 +36,16 @@ export default function CardComponent(
 						<button
 							className="w-full flex justify-between  font-bold cursor-pointer hover:underline text-gray-800 dark:text-gray-50"
 							onClick={() =>
-								dispatch(addToCart({ id, image, title, price }))
+								dispatch(
+									addToCart({
+										id,
+										image,
+										title,
+										price,
+										description,
+										category,
+									})
+								)
 							}>
 							<span className="text-base">Add to Cart</span>
 						</button>

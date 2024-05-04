@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import StoreProvider from "./storeProvider";
 import SessionWrapper from "./SessionWrapper";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

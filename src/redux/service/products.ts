@@ -11,7 +11,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 				`api/products/?page=${page}&page_size=${pageSize}`,
 		}),
 		// get single product
-		getProductById: builder.query<any, number>({
+		getProductById: builder.query<any, string>({
 			query: (id) => `api/products/${id}/`,
 		}),
 

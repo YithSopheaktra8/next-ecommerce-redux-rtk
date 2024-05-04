@@ -10,9 +10,11 @@ import { useState } from "react";
 import ResponsivePagination from "react-responsive-pagination";
 import "react-responsive-pagination/themes/classic.css";
 import { useAppSelector } from "@/redux/hook";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
 	const [currentPage, setCurrentPage] = useState(1);
+	const route = useRouter();
 
 	const words = "Fitness kits that help you keep fit.";
 	const { data } = useGetProductsQuery({
@@ -20,7 +22,6 @@ export default function Home() {
 		pageSize: 8,
 	});
 	const totalPages = data?.total;
-
 
 	// if (isLoading) return <LoadingComponent />;
 
@@ -185,6 +186,7 @@ export default function Home() {
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 w-screen px-[30px] md:[50px] lg:px-[30px] xl:px-[100px] gap-5 xl:gap-12 mt-14">
 					{data?.results.map((product: any) => (
 						<CardComponent
+							onClick={() => route.push(`/detail/${product.id}`)}
 							key={product.id}
 							title={product.name}
 							description={product.desc}
@@ -195,6 +197,7 @@ export default function Home() {
 							}
 							price={product.price}
 							id={product.id}
+							category={product.category}
 						/>
 					))}
 				</div>

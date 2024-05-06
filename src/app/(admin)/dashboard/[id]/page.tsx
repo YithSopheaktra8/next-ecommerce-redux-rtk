@@ -110,12 +110,32 @@ export default function UpdateProduct(params: Params) {
 		setProductImage(product.image);
 	};
 
-	console.log(productData);
+	const handleUpdateProduct = (product: ValueTypes) => {
+		if (product.productName === undefined) {
+			product.productName = productData?.name;
+		}
+		if (product.productDesc === undefined) {
+			product.productDesc = productData?.desc;
+		}
+		if (product.productPrice === undefined) {
+			product.productPrice = productData?.price;
+		}
+		if (product.productQuantity === undefined) {
+			product.productQuantity = productData?.quantity;
+		}
+		if (product.productImage === undefined) {
+			product.productImage = productData?.image;
+		}
 
-	const handleUpdateProduct = (product: any) => {
 		updateProduct({
 			id: productData?.id,
-			updatedProduct: product,
+			updatedProduct: {
+				name: product.productName,
+				desc: product.productDesc,
+				price: product.productPrice,
+				quantity: product.productQuantity,
+				image: product.productImage,
+			},
 		});
 		if (updateSuccess) {
 			notifySuccess();
@@ -280,7 +300,13 @@ export default function UpdateProduct(params: Params) {
 										Product Name
 									</label>
 									<Field
-										value={initialValues?.productName}
+										placeholder={initialValues?.productName}
+										onChange={(e: any) => {
+											setFieldValue(
+												"productName",
+												e.target.value
+											);
+										}}
 										type="text"
 										id="productName"
 										name="productName"
@@ -301,7 +327,9 @@ export default function UpdateProduct(params: Params) {
 									</label>
 									<div className="relative">
 										<Field
-											value={initialValues?.productDesc}
+											placeholder={
+												initialValues?.productDesc
+											}
 											as="textarea"
 											type="text"
 											id="productDesc"
@@ -324,7 +352,9 @@ export default function UpdateProduct(params: Params) {
 									</label>
 									<div className="relative">
 										<Field
-                                            placeholder={initialValues?.productPrice}
+											placeholder={
+												initialValues?.productPrice
+											}
 											type="text"
 											id="productPrice"
 											name="productPrice"
@@ -346,7 +376,7 @@ export default function UpdateProduct(params: Params) {
 									</label>
 									<div className="relative">
 										<Field
-											value={
+											placeholder={
 												initialValues?.productQuantity
 											}
 											type="text"

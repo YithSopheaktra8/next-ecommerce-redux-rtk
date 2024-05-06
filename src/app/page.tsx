@@ -199,6 +199,7 @@ export default function Home() {
 							id={product.id}
 							category={product.category}
 						/>
+						
 					))}
 				</div>
 			</section>

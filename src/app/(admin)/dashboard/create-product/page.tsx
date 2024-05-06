@@ -58,6 +58,7 @@ const validationSchema = Yup.object().shape({
 const uploadInitialValues = {
 	name: "",
 	file: null,
+	type: "",
 };
 
 const uploadValidationSchema = Yup.object().shape({
@@ -159,6 +160,7 @@ export default function CreateProduct() {
 										console.error("No file selected");
 										return;
 									}
+									console.log(value);
 									const filenameWithoutExtension =
 										value.name.split(".")[0];
 									const formData = new FormData();
@@ -167,12 +169,18 @@ export default function CreateProduct() {
 										"name",
 										filenameWithoutExtension
 									);
-									uploadProductImage({
-										image: formData,
-									});
-									uploadCategoryImage({
-										image: formData,
-									});
+
+									if (value.type === "ProductImage") {
+										uploadProductImage({
+											image: formData,
+										});
+									}
+
+									if (value.type === "CategoryImage") {
+										uploadCategoryImage({
+											image: formData,
+										});
+									}
 								}}>
 								{({ setFieldValue }) => (
 									<Form className="space-y-4 ">
@@ -193,6 +201,10 @@ export default function CreateProduct() {
 														"name",
 														e.target.files[0].name
 													);
+													setFieldValue(
+														"type",
+														"ProductImage"
+													);
 												}}
 												type="file"
 												id="productName"
@@ -209,7 +221,7 @@ export default function CreateProduct() {
 										{/* Category Image */}
 										<div>
 											<label
-												htmlFor="productName"
+												htmlFor="categoryImage"
 												className="block text-sm font-medium text-gray-700">
 												Category Image
 											</label>
@@ -222,6 +234,10 @@ export default function CreateProduct() {
 													setFieldValue(
 														"name",
 														e.target.files[0].name
+													);
+													setFieldValue(
+														"type",
+														"CategoryImage"
 													);
 												}}
 												type="file"
@@ -510,22 +526,3 @@ export default function CreateProduct() {
 		</main>
 	);
 }
-
-const CustomInput = ({ field, form, setFieldValue }: any) => {
-	const [imagePreview, setImagePreview] = useState("");
-
-	const handleUploadeFile = (e: any) => {
-		console.log(e);
-		const file = e.target.files[0];
-		const localUrl = URL.createObjectURL(file);
-		console.log(localUrl);
-		setImagePreview(localUrl);
-
-		setFieldValue(field.name, file);
-	};
-	return (
-		<div>
-			<input onChange={(e) => handleUploadeFile(e)} type="file" />
-		</div>
-	);
-};

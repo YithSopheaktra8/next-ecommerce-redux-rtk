@@ -18,9 +18,10 @@ export default function CardComponent({
 
 	return (
 		<div className="w-full">
-			<Card shadow="sm" key={id} isPressable isBlurred isHoverable onClick={onClick}>
+			<Card shadow="sm" key={id} isPressable isBlurred isHoverable>
 				<CardBody className="overflow-visible p-0">
 					<Image
+						onClick={onClick}
 						shadow="sm"
 						radius="lg"
 						width="100%"

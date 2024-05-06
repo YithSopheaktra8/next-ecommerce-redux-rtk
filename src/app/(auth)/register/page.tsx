@@ -37,7 +37,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Register() {
-	const [registerUser, { data }] = useRegisterUserMutation();
+	const [registerUser, { data, isLoading }] = useRegisterUserMutation();
 	const route = useRouter();
 
 	const handleSubmit = (values: any) => {
@@ -455,7 +455,7 @@ export default function Register() {
 							<button
 								type="submit"
 								className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300">
-								Register
+								{isLoading ? ("loading....") : "Sign Up"}
 							</button>
 						</Form>
 					</Formik>

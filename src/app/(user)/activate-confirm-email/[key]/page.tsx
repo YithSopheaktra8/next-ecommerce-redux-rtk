@@ -11,9 +11,34 @@ import style from "./style.module.css";
 import Button from "./components/Button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useVerifyEmailMutation } from "@/redux/service/user";
+import { useEffect } from "react";
+import LoadingComponent from "@/components/LoadingComponent";
 
 export default function ConfirmEmail(props: Props) {
-	const router = useRouter();
+	const [verifyEmail, { isLoading, data }] = useVerifyEmailMutation();
+	const { key } = props.params;
+	console.log(key);
+
+	const handleVerifyEmail = async () => {
+		try {
+			const res = await verifyEmail(decodeURIComponent(key)).unwrap();
+			if (res.status === 200) {
+				console.log("verifyEmail:", data);
+				console.log("Email has been confirmed!");
+			}
+		} catch (e) {
+			console.log("error verify email", e);
+		}
+	};
+
+	useEffect(() => {
+		handleVerifyEmail();
+	}, [key]);
+
+	if (isLoading) {
+		return <LoadingComponent />;
+	}
 
 	return (
 		<main className={style.container}>
@@ -33,7 +58,9 @@ export default function ConfirmEmail(props: Props) {
 					អ្នកអាចចូលទៅទំព័រចូលដោយចុចលើប៊ូតុងខាងក្រោយ!
 				</p>
 				{/* Button */}
-				<Link href="/login" className="my-8 bg-blue-500 px-24 py-8 rounded-lg text-white font-bold text-5xl">
+				<Link
+					href="/login"
+					className="my-8 bg-blue-500 px-24 py-8 rounded-lg text-white font-bold text-5xl">
 					Login
 				</Link>
 			</section>

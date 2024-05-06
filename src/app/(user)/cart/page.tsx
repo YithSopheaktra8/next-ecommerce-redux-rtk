@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import ProductCart from "@/components/ProductCart";
-import { addPrice} from "@/redux/features/cart/cartSlice";
+import { addPrice } from "@/redux/features/cart/cartSlice";
+import Image from "next/image";
 
 export default function Cart() {
-    const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 	const ShippingTax = 65;
 	const products = useAppSelector((state) => state.cart.products);
 	const subTotalPrice = useAppSelector((state) => state.cart.totalPrice);
@@ -56,18 +57,27 @@ export default function Cart() {
 								Shopping Cart
 							</p>
 							{products.length === 0 ? (
-								<p className="text-3xl leading-10  text-gray-800 pt-3 text-center mt-10">
-									No items in your cart
-								</p>
+								<div className="grid place-content-center">
+									<Image
+										src="/empty_cart.png"
+										width={500}
+										height={500}
+										alt="empty-cart"
+
+									/>
+									<p className="text-3xl leading-10  text-gray-800 pt-3 text-center mt-10">
+										No items in your cart
+									</p>
+								</div>
 							) : (
 								products.map((product) => (
 									<ProductCart
-										key={product.id}
-										title={product.title}
-										price={product.price}
-										image={product.image}
-										id={product.id}
-										description={product.title}
+										key={product?.id}
+										title={product?.title}
+										price={product?.price}
+										image={product?.image}
+										id={product?.id}
+										description={product?.title}
 										category="Coffee"
 									/>
 								))
@@ -115,7 +125,7 @@ export default function Cart() {
 										<p className="text-2xl font-bold leading-normal text-right text-gray-800">
 											$
 											{products.length === 0
-												? 0.00
+												? 0.0
 												: totalPrice}
 										</p>
 									</div>

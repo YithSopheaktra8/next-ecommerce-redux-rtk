@@ -1,7 +1,15 @@
 "use client";
+import {
+	addToCart,
+	decrement,
+	increment,
+	removeFromCart,
+} from "@/redux/features/cart/cartSlice";
+import { useAppDispatch } from "@/redux/hook";
 import { useGetProductByIdQuery } from "@/redux/service/products";
-import { ProductType } from "@/types/productType";
+import { CartProductType, ProductType } from "@/types/productType";
 import Image from "next/image";
+import { useState } from "react";
 
 type Params = {
 	params: { id: string };
@@ -9,6 +17,16 @@ type Params = {
 
 export default function ProductCardDetailComponent(params: Params) {
 	const { data } = useGetProductByIdQuery(params.params.id);
+	const dispatch = useAppDispatch();
+
+	const product: CartProductType = {
+		id: data?.id,
+		image: data?.image,
+		title: data?.name,
+		price: data?.price,
+		description: data?.desc,
+		category: data?.category,
+	};
 
 	return (
 		<main>
@@ -32,9 +50,13 @@ export default function ProductCardDetailComponent(params: Params) {
 								{data?.name}
 							</h2>
 							<div className="flex flex-wrap gap-4 mt-4">
-								<p className=" text-4xl font-semibold">${data?.price}</p>
+								<p className=" text-4xl font-semibold">
+									${data?.price}
+								</p>
 								<p className="text-gray-400 text-xl">
-									<span>${30 + parseFloat(`${data?.price}`)}</span>
+									<span>
+										${30 + parseFloat(`${data?.price}`)}
+									</span>
 									<span className="text-sm ml-1">
 										Tax included
 									</span>
@@ -82,6 +104,7 @@ export default function ProductCardDetailComponent(params: Params) {
 
 							<div className="flex flex-wrap gap-4 mt-8">
 								<button
+									onClick={() => dispatch(addToCart(product))}
 									type="button"
 									className="min-w-[200px] px-4 py-2.5 border border-gray-900 bg-transparent  text-sm font-semibold rounded">
 									Add to cart

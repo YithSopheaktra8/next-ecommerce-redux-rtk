@@ -20,7 +20,7 @@ import {
 	User,
 } from "@nextui-org/react";
 import { AcmeLogo } from "./AcemeLogo";
-import { redirect, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { signOut, useSession } from "next-auth/react";
@@ -41,9 +41,7 @@ export default function NavbarComponent() {
 	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const router = useRouter();
-	const accessToken = useAppSelector((state) => state.accessToken.token);
-	const { data,  isSuccess } = useGetUserProfileQuery({});
-	console.log("user Profile : ", data);
+	const { data : userProfileData,  isSuccess } = useGetUserProfileQuery({});
 
 	let userProfile: UserProfile;
 	if (session.data != null) {
@@ -55,10 +53,10 @@ export default function NavbarComponent() {
 		};
 	} else if (isSuccess) {
 		userProfile = {
-			userAvatar: data.profile.avatar || "",
-			userBio: data.profile.bio || "",
-			userEmail: data.email || "",
-			userUsername: data.last_name || "",
+			userAvatar: userProfileData.profile.avatar || "",
+			userBio: userProfileData.profile.bio || "",
+			userEmail: userProfileData.email || "",
+			userUsername: userProfileData.last_name || "",
 		};
 	} else {
 		userProfile = {
@@ -68,8 +66,6 @@ export default function NavbarComponent() {
 			userUsername: "",
 		};
 	}
-
-	console.log(userProfile)
 
 	const menuItems = [
 		{
@@ -90,8 +86,7 @@ export default function NavbarComponent() {
 		},
 	];
 
-	const cart = useAppSelector((state) => state.cart.products);
-	let cartLength = cart.length;
+	const cart = useAppSelector((state) => state.cart.totalItems);
 
 	const handleLogout = async () => {
 		fetch(process.env.NEXT_PUBLIC_BASE_URL_LOCALHOST + "/logout", {
@@ -114,7 +109,7 @@ export default function NavbarComponent() {
 
 	useEffect(() => {
 		
-	}, [userProfile]);
+	}, [userProfileData, session.data]);
 
 	return (
 		<Navbar
@@ -163,7 +158,7 @@ export default function NavbarComponent() {
 							height={30}
 						/>
 						<span className="self-center grid place-content-center whitespace-nowrap text-medium font-medium text-white bg-black w-[25px] h-[25px] rounded-full absolute top-1 ml-5">
-							{cartLength}
+							{cart}
 						</span>
 					</button>
 					{true ? (

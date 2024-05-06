@@ -19,12 +19,11 @@ export default function ProductCart({
 	description,
 }: ProductType) {
 	const dispatch = useAppDispatch();
-	const products = useAppSelector((state) => state.cart.products);
+	const products = useAppSelector((state) => state.cart.totalItems);
 	let [quantity, setQuantity] = useState(1);
 
 	const handleIncrement = (id: number) => {
 		setQuantity((quantity += 1));
-
 		dispatch(increment(id));
 	};
 

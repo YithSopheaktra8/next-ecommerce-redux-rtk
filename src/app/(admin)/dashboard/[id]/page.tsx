@@ -1,35 +1,24 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { ChangeEvent, useEffect, useState } from "react";
 import {
-	Formik,
-	Form,
-	Field,
-	ErrorMessage,
-	useFormikContext,
-	useFormik,
-} from "formik";
-import * as Yup from "yup";
-import {
-	Button,
-	Dropdown,
-	DropdownItem,
-	DropdownMenu,
-	DropdownTrigger,
-	Image,
-	Pagination,
-} from "@nextui-org/react";
-import { redirect, useRouter } from "next/navigation";
-import {
-	productApi,
-	useCreateProductMutation,
-	useGetProductsCategoryQuery,
+	useGetProductByIdQuery,
 	useGetProductsImageQuery,
+	useUpdateProductMutation,
 	useUploadCategoryImageMutation,
 	useUploadProductImageMutation,
 } from "@/redux/service/products";
-import "react-responsive-pagination/themes/classic.css";
+import {
+	Dropdown,
+	DropdownTrigger,
+	Button,
+	DropdownMenu,
+	DropdownItem,
+	Pagination,
+} from "@nextui-org/react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import React, { useEffect, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
+import Image from "next/image";
+import * as Yup from "yup";
 
 type ValueTypes = {
 	productName: string;
@@ -37,16 +26,13 @@ type ValueTypes = {
 	productPrice: number;
 	productQuantity: number;
 	productImage: string;
-	productCategoryName: string;
-	productCategoryIcon: string;
 };
 
 const validationSchema = Yup.object().shape({
-	productName: Yup.string().required("Product Name is required"),
-	productDesc: Yup.string().required("Description is required"),
-	productPrice: Yup.number().required("Price is required"),
-	productQuantity: Yup.number().required("Quantity is required"),
-	productCategoryName: Yup.string().required("Category Name is required"),
+	productName: Yup.string(),
+	productDesc: Yup.string(),
+	productPrice: Yup.number(),
+	productQuantity: Yup.number(),
 });
 
 const uploadInitialValues = {
@@ -58,6 +44,10 @@ const uploadInitialValues = {
 const uploadValidationSchema = Yup.object().shape({
 	file: Yup.mixed().required("File is required"),
 });
+
+type Params = {
+	params: { id: string };
+};
 
 const notifySuccess = () =>
 	toast.success("Success", {
@@ -85,18 +75,8 @@ const notifyError = () =>
 		transition: Bounce,
 	});
 
-export default function CreateProduct() {
-	const router = useRouter();
+export default function UpdateProduct(params: Params) {
 	const [currentPage, setCurrentPage] = useState(1);
-	const [categoryCurrentPage, setCategoryCurrentPage] = useState(1);
-	const { data } = useGetProductsImageQuery({
-		page: currentPage,
-		pageSize: 5,
-	});
-	const { data: categoryData } = useGetProductsCategoryQuery({
-		page: categoryCurrentPage,
-		pageSize: 5,
-	});
 
 	const [
 		uploadProductImage,
@@ -112,65 +92,48 @@ export default function CreateProduct() {
 		{ data: categoryImageData, isSuccess: categoryImageSuccess },
 	] = useUploadCategoryImageMutation();
 
-	const [
-		createProduct,
-		{
-			data: productData,
-			isSuccess: productSuccess,
-			isError: productError,
-			isLoading: productLoading,
-		},
-	] = useCreateProductMutation();
-	const categoryLength = categoryData?.total;
-	const productImageLength = data?.total;
-	const [productImage, setProductImage] = useState(
-		"https://psediting.websites.co.in/obaju-turquoise/img/product-placeholder.png"
-	);
-	const [categoryImage, setCategoryImage] = useState(
-		"https://psediting.websites.co.in/obaju-turquoise/img/product-placeholder.png"
-	);
+	const { data: ProductImage } = useGetProductsImageQuery({
+		page: currentPage,
+		pageSize: 5,
+	});
+
+	const { data: productData } = useGetProductByIdQuery(params.params.id);
+	const [updateProduct, { isSuccess: updateSuccess, isError: updateError }] =
+		useUpdateProductMutation();
+
+	const [productImage, setProductImage] = useState("");
+
+	const productImageLength = productData?.total;
 
 	const handleProductImage = (product: any, setFieldValue: any) => {
 		setFieldValue("productImage", product.image);
 		setProductImage(product.image);
 	};
 
-	const handleCategoryImage = (category: any, setFieldValue: any) => {
-		setFieldValue("productCategoryIcon", category.image);
-		setCategoryImage(category.image);
-	};
+	console.log(productData);
 
-	const handleCreateProduct = (product: any) => {
-		createProduct({
-			newProduct: {
-				category: {
-					name: product.productCategoryName,
-					icon: product.productCategoryIcon,
-				},
-				name: product.productName,
-				desc: product.productDesc,
-				image: product.productImage,
-				price: product.productPrice,
-				quantity: product.productQuantity,
-			},
+	const handleUpdateProduct = (product: any) => {
+		updateProduct({
+			id: productData?.id,
+			updatedProduct: product,
 		});
-		if (productSuccess) {
+		if (updateSuccess) {
 			notifySuccess();
 		}
-		if (productError) {
+		if (updateError) {
 			notifyError();
 		}
 	};
 
 	const initialValues: ValueTypes = {
-		productName: "",
-		productDesc: "",
-		productPrice: 0,
-		productQuantity: 0,
-		productImage: "",
-		productCategoryName: "",
-		productCategoryIcon: "",
+		productName: productData?.name,
+		productDesc: productData?.desc,
+		productPrice: productData?.price,
+		productQuantity: productData?.quantity,
+		productImage: productData?.image,
 	};
+
+	useEffect(() => {}, [params.params.id]);
 
 	return (
 		<main className="flex justify-center">
@@ -305,7 +268,7 @@ export default function CreateProduct() {
 						initialValues={initialValues}
 						validationSchema={validationSchema}
 						onSubmit={(value) => {
-							handleCreateProduct(value);
+							handleUpdateProduct(value);
 						}}>
 						{({ setFieldValue }) => (
 							<Form className="space-y-4 ">
@@ -317,6 +280,7 @@ export default function CreateProduct() {
 										Product Name
 									</label>
 									<Field
+										value={initialValues?.productName}
 										type="text"
 										id="productName"
 										name="productName"
@@ -337,6 +301,7 @@ export default function CreateProduct() {
 									</label>
 									<div className="relative">
 										<Field
+											value={initialValues?.productDesc}
 											as="textarea"
 											type="text"
 											id="productDesc"
@@ -359,6 +324,7 @@ export default function CreateProduct() {
 									</label>
 									<div className="relative">
 										<Field
+                                            placeholder={initialValues?.productPrice}
 											type="text"
 											id="productPrice"
 											name="productPrice"
@@ -380,6 +346,9 @@ export default function CreateProduct() {
 									</label>
 									<div className="relative">
 										<Field
+											value={
+												initialValues?.productQuantity
+											}
 											type="text"
 											id="productQuantity"
 											name="productQuantity"
@@ -404,7 +373,7 @@ export default function CreateProduct() {
 											<DropdownMenu
 												variant="faded"
 												aria-label="Dropdown menu with description">
-												{data?.results.map(
+												{ProductImage?.results.map(
 													(item: any) => (
 														<DropdownItem
 															onClick={() =>
@@ -446,92 +415,11 @@ export default function CreateProduct() {
 										</Dropdown>
 									</div>
 									<Image
-										src={productImage}
-										alt="preview"
-										width={250}
-										height={250}
-										className="rounded-lg mt-5"
-									/>
-								</div>
-								{/* category name */}
-								<div>
-									<label
-										htmlFor="productCategoryName"
-										className="block text-sm font-medium text-gray-700">
-										Category Name
-									</label>
-									<div className="relative">
-										<Field
-											type="text"
-											id="productCategoryName"
-											name="productCategoryName"
-											className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-										/>
-									</div>
-									<ErrorMessage
-										name="productCategoryName"
-										component="div"
-										className="text-red-500 text-base text-center my-3"
-									/>
-								</div>
-								{/* category icon */}
-								<div>
-									<div className="relative">
-										<Dropdown>
-											<DropdownTrigger>
-												<Button variant="bordered">
-													Select Category Icon
-												</Button>
-											</DropdownTrigger>
-											<DropdownMenu
-												closeOnSelect
-												variant="faded"
-												aria-label="Dropdown menu with description">
-												{categoryData?.results.map(
-													(item: any) => (
-														<DropdownItem
-															onClick={() =>
-																handleCategoryImage(
-																	item,
-																	setFieldValue
-																)
-															}
-															key={item.id}
-															shortcut={
-																item.name
-															}>
-															<Image
-																src={item.image}
-																width={50}
-																height={50}
-																alt={item.name}
-															/>
-														</DropdownItem>
-													)
-												)}
-												<DropdownItem
-													key="delete"
-													closeOnSelect>
-													<Pagination
-														isCompact
-														showControls
-														total={categoryLength}
-														initialPage={1}
-														page={
-															categoryCurrentPage
-														}
-														onChange={(page) =>
-															setCategoryCurrentPage(
-																page
-															)
-														}
-													/>
-												</DropdownItem>
-											</DropdownMenu>
-										</Dropdown>
-									</div>
-									<Image
-										src={categoryImage}
+										src={
+											productImage === ""
+												? productData?.image
+												: productImage
+										}
 										alt="preview"
 										width={250}
 										height={250}
@@ -543,19 +431,19 @@ export default function CreateProduct() {
 								<button
 									type="submit"
 									className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300">
-									Create
+									Update
 								</button>
 							</Form>
 						)}
 					</Formik>
 					{/* <div className="mt-4 text-sm text-gray-600 text-center">
-						<p>
-							Already have an account?{" "}
-							<a href="#" className="text-black hover:underline">
-								Login here
-							</a>
-						</p>
-					</div> */}
+                <p>
+                    Already have an account?{" "}
+                    <a href="#" className="text-black hover:underline">
+                        Login here
+                    </a>
+                </p>
+            </div> */}
 				</div>
 			</div>
 			<ToastContainer />

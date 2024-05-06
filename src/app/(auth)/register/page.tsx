@@ -37,14 +37,15 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function Register() {
-	const [registerUser, { data, isLoading }] = useRegisterUserMutation();
+	const [registerUser, { data, isLoading, isError, isSuccess }] = useRegisterUserMutation();
 	const route = useRouter();
+
 
 	const handleSubmit = (values: any) => {
 		registerUser({ user: values });
 
 	};
-	console.log("register data: ", data);
+
 
 	return (
 		<main className="flex h-screen">

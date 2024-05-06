@@ -8,6 +8,8 @@ import Footer from "@/components/Footer";
 import StoreProvider from "./storeProvider";
 import SessionWrapper from "./SessionWrapper";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const inter = Inter({ subsets: ["latin"] });
 

@@ -37,6 +37,10 @@ export default function Dashboard() {
 
 	const columns: TableColumn<ProductType>[] = [
 		{
+			name: "Product ID",
+			selector: (row) => row.id,
+		},
+		{
 			name: "Product Title",
 			selector: (row) => row.title,
 		},
@@ -77,6 +81,8 @@ export default function Dashboard() {
 								View
 							</DropdownItem>
 							<DropdownItem
+								href={`/dashboard/${row.id}`}
+								as={Link}
 								key="edit"
 								description="Edit Product"
 								startContent={<FaEdit size={30} />}>

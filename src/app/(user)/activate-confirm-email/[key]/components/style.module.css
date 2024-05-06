@@ -1,0 +1,3 @@
+.container {
+    @apply flex px-8 py-4 items-center justify-center bg-blue-700 rounded-xl text-4xl font-semibold text-gray-100;
+}

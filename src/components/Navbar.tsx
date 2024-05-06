@@ -7,7 +7,6 @@ import {
 	NavbarBrand,
 	NavbarContent,
 	NavbarItem,
-	Link,
 	Button,
 	NavbarMenuToggle,
 	NavbarMenu,
@@ -27,15 +26,14 @@ import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { signOut, useSession } from "next-auth/react";
 import { clearAccessToken } from "@/redux/features/token/tokenSlice";
 import { cookies } from "next/headers";
-import { useUserProfileQuery } from "@/redux/service/auth";
+import Link from "next/link";
+
+import type { UserProfile } from "@/types/userType";
 import {
-	selectAvatar,
-	selectBio,
-} from "@/redux/features/userProfile/userProfileSlice";
-import {
-	addUser,
-	fetchUserProfile,
-} from "@/redux/features/userProfile/userProfileSlice";
+	useGetMyProductsQuery,
+	useGetProductsQuery,
+	useGetUserProfileQuery,
+} from "@/redux/service/products";
 
 export default function NavbarComponent() {
 	const dispatch = useAppDispatch();
@@ -43,9 +41,35 @@ export default function NavbarComponent() {
 	const pathName = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const router = useRouter();
-	const userAvatar = useAppSelector(selectAvatar);
-	const userBio = useAppSelector(selectBio);
-	const userProfile = useAppSelector((state) => state.userProfile);
+	const accessToken = useAppSelector((state) => state.accessToken.token);
+	const { data,  isSuccess } = useGetUserProfileQuery({});
+	console.log("user Profile : ", data);
+
+	let userProfile: UserProfile;
+	if (session.data != null) {
+		userProfile = {
+			userAvatar: session.data?.user?.image || "",
+			userBio: session.data?.user?.name || "",
+			userEmail: session.data?.user?.email || "",
+			userUsername: session.data?.user?.name || "",
+		};
+	} else if (isSuccess) {
+		userProfile = {
+			userAvatar: data.profile.avatar || "",
+			userBio: data.profile.bio || "",
+			userEmail: data.email || "",
+			userUsername: data.last_name || "",
+		};
+	} else {
+		userProfile = {
+			userAvatar: "",
+			userBio: "",
+			userEmail: "",
+			userUsername: "",
+		};
+	}
+
+	console.log(userProfile)
 
 	const menuItems = [
 		{
@@ -69,14 +93,6 @@ export default function NavbarComponent() {
 	const cart = useAppSelector((state) => state.cart.products);
 	let cartLength = cart.length;
 
-	const handleSignout = async () => {
-		const isSignout = await signOut();
-		if (isSignout) {
-			signOut();
-			router.push("/login");
-		}
-	};
-
 	const handleLogout = async () => {
 		fetch(process.env.NEXT_PUBLIC_BASE_URL_LOCALHOST + "/logout", {
 			method: "POST",
@@ -91,8 +107,14 @@ export default function NavbarComponent() {
 				console.error("Refresh Token error:", error);
 			});
 		dispatch(clearAccessToken());
+		signOut();
 		router.push("/login");
 	};
+
+
+	useEffect(() => {
+		
+	}, [userProfile]);
 
 	return (
 		<Navbar
@@ -126,9 +148,9 @@ export default function NavbarComponent() {
 					</Link>
 				</NavbarItem>
 				<NavbarItem isActive={pathName === "/dashboard"}>
-					<Link color="foreground" href="/dashboard">
+					<a color="foreground" href="/dashboard">
 						My Shop
-					</Link>
+					</a>
 				</NavbarItem>
 			</NavbarContent>
 			<NavbarContent justify="end">
@@ -152,23 +174,11 @@ export default function NavbarComponent() {
 										as="button"
 										avatarProps={{
 											isBordered: true,
-											src: `${
-												session.data === null
-													? userAvatar
-													: session.data?.user?.image
-											}`,
+											src: userProfile.userAvatar,
 										}}
 										className="flex flex-col transition-transform md:flex-row"
-										description={
-											session.data === null
-												? userBio
-												: session.data?.user?.name
-										}
-										name={
-											session.data === null
-												? ""
-												: session.data?.user?.name
-										}
+										description={userProfile.userBio}
+										name={userProfile.userUsername}
 									/>
 								</DropdownTrigger>
 								<DropdownMenu
@@ -181,28 +191,27 @@ export default function NavbarComponent() {
 											Signed in as
 										</p>
 										<p className="font-bold">
-											{session.data === null
-												? "User"
-												: session.data?.user?.email}
+											{userProfile.userUsername}
 										</p>
 									</DropdownItem>
-									<DropdownItem
-										key="login"
-										onClick={() => {
-											router.push("/login");
-										}}>
-										Login
-									</DropdownItem>
-									<DropdownItem
-										key="logout"
-										color="danger"
-										onClick={() => {
-											session.data === null
-												? handleLogout()
-												: handleSignout();
-										}}>
-										Log Out
-									</DropdownItem>
+									{userProfile.userEmail == "" ? (
+										<DropdownItem
+											key="login"
+											onClick={() =>
+												router.push("/login")
+											}>
+											<Link href="/login" color="primary">
+												Login
+											</Link>
+										</DropdownItem>
+									) : (
+										<DropdownItem
+											key="logout"
+											color="danger"
+											onClick={() => handleLogout()}>
+											Log Out
+										</DropdownItem>
+									)}
 								</DropdownMenu>
 							</Dropdown>
 						</div>
@@ -221,7 +230,6 @@ export default function NavbarComponent() {
 				{menuItems.map((item, index) => (
 					<NavbarMenuItem key={`${item}-${index}`}>
 						<Link
-
 							color={
 								index === 2
 									? "primary"
@@ -230,10 +238,8 @@ export default function NavbarComponent() {
 									: "foreground"
 							}
 							className="w-full"
-							href={item.path}
-							size="lg">
+							href={item.path}>
 							{item.name}
-						
 						</Link>
 					</NavbarMenuItem>
 				))}

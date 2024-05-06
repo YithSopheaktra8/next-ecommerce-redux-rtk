@@ -9,11 +9,63 @@ export const productApi = ecommerceApi.injectEndpoints({
 		getProducts: builder.query<any, { page: number; pageSize: number }>({
 			query: ({ page = 1, pageSize = 10 }) =>
 				`api/products/?page=${page}&page_size=${pageSize}`,
+			providesTags: ["Product"],
 		}),
 		// get single product
 		getProductById: builder.query<any, string>({
 			query: (id) => `api/products/${id}/`,
+			providesTags: ["Product"],
 		}),
+
+		getMyProducts: builder.query<any, {}>({
+			query: () => `api/products/my_products/`,
+			providesTags: ["Product"],
+		}),
+
+		// get api file products
+		getProductsImage: builder.query<
+			any,
+			{ page: number; pageSize: number }
+		>({
+			query: ({ page = 1, pageSize = 5 }) =>
+				`api/file/product/?page=${page}&page_size=${pageSize}`,
+			providesTags: ["ProductImage"],
+		}),
+
+		// get api file products category
+		getProductsCategory: builder.query<
+			any,
+			{ page: number; pageSize: number }
+		>({
+			query: ({ page = 1, pageSize = 5 }) =>
+				`api/file/category/?page=${page}&page_size=${pageSize}`,
+			providesTags: ["ProductImage"],
+		}),
+
+		getUserProfile: builder.query<any, any>({
+			query: () => "api/user/",
+			providesTags: ["UserProfile"],
+		}),
+
+		// upload a product image
+		uploadProductImage: builder.mutation<any, { image: object }>({
+			query: ({ image }) => ({
+				url: "api/file/product/",
+				method: "POST",
+				body: image,
+			}),
+			invalidatesTags: ["ProductImage"],
+		}),
+
+		uploadCategoryImage: builder.mutation<any, { image: object }>({
+			query: ({ image }) => ({
+				url: "api/file/category/",
+				method: "POST",
+				body: image,
+			}),
+			invalidatesTags: ["ProductImage"],
+		}),
+		
 
 		// create a product
 		createProduct: builder.mutation<any, { newProduct: object }>({
@@ -22,6 +74,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 				method: "POST",
 				body: newProduct,
 			}),
+			invalidatesTags: ["Product"],
 		}),
 
 		// update a product
@@ -34,6 +87,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 				method: "PATCH",
 				body: updatedProduct,
 			}),
+			invalidatesTags: ["Product"],
 		}),
 
 		// delete a product
@@ -42,6 +96,7 @@ export const productApi = ecommerceApi.injectEndpoints({
 				url: `api/products/${id}/`,
 				method: "DELETE",
 			}),
+			invalidatesTags: ["Product"],
 		}),
 	}),
 	overrideExisting: false, // don't override existing hooks
@@ -55,4 +110,10 @@ export const {
 	useCreateProductMutation,
 	useUpdateProductMutation,
 	useDeleteProductMutation,
+	useGetMyProductsQuery,
+	useGetUserProfileQuery,
+	useGetProductsImageQuery,
+	useGetProductsCategoryQuery,
+	useUploadProductImageMutation,
+	useUploadCategoryImageMutation
 } = productApi;

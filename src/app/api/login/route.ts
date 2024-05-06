@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
 		path: "/",
 		sameSite: "lax", // or "strict" or "none"
 	});
+	
 	// Return the access token and user data to the client-side
 	// with the serialized refresh token as a cookie
 	return NextResponse.json(

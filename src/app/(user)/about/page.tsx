@@ -3,8 +3,13 @@ import React from "react";
 import Image from "next/image";
 import { AuroraBackground } from "@/components/ui/aurora-background";
 import { motion } from "framer-motion";
+import { useAppSelector } from "@/redux/hook";
 
 export default function About() {
+
+	const acess = useAppSelector((state) => state.accessToken.token);
+	console.log("about :",acess)
+
 	return (
 		<main>
 			<AuroraBackground>

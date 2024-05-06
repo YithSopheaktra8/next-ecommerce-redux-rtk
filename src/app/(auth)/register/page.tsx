@@ -2,7 +2,50 @@
 import React from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useRegisterUserMutation } from "@/redux/service/user";
+import { useRouter } from "next/navigation";
+
+type ValueTypes = {
+	email: string;
+	password1: string;
+	password2: string;
+	first_name: string;
+	last_name: string;
+};
+
+const initialValues: ValueTypes = {
+	email: "",
+	password1: "",
+	password2: "",
+	first_name: "",
+	last_name: "",
+};
+
+const validationSchema = Yup.object().shape({
+	email: Yup.string().email("Invalid email").required("Required"),
+	password1: Yup.string().min(
+		8,
+		"Password is too short, At lease 8 characters"
+	),
+	password2: Yup.string()
+		.oneOf([Yup.ref("password1")], "Passwords must match")
+		.required("Required"),
+	first_name: Yup.string().required("Required"),
+	last_name: Yup.string().required("Required"),
+});
+
 export default function Register() {
+	const [registerUser, { data }] = useRegisterUserMutation();
+	const route = useRouter();
+
+	const handleSubmit = (values: any) => {
+		registerUser({ user: values });
+
+	};
+	console.log("register data: ", data);
+
 	return (
 		<main className="flex h-screen">
 			<div className="hidden lg:flex items-center justify-center flex-1 bg-white text-black">
@@ -312,88 +355,110 @@ export default function Register() {
 					<div className="mt-4 text-sm text-gray-600 text-center">
 						<p>or with email</p>
 					</div>
-					<form action="#" method="POST" className="space-y-4">
-						<div>
-							<label
-								htmlFor="email"
-								className="block text-sm font-medium text-gray-700">
-								Email
-							</label>
-							<input
-								type="text"
-								id="email"
-								name="email"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
-							<label
-								htmlFor="firstname"
-								className="block text-sm font-medium text-gray-700">
-								First Name
-							</label>
-							<input
-								type="text"
-								id="firstname"
-								name="firstname"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
-							<label
-								htmlFor="lastname"
-								className="block text-sm font-medium text-gray-700">
-								Last Name
-							</label>
-							<input
-								type="text"
-								id="lastname"
-								name="lastname"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
-							<label
-								htmlFor="password"
-								className="block text-sm font-medium text-gray-700">
-								Password
-							</label>
-							<input
-								type="password"
-								id="password"
-								name="password"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
-							<label
-								htmlFor="confirmpassword"
-								className="block text-sm font-medium text-gray-700">
-								Confirm Password
-							</label>
-							<input
-								type="confirmpassword"
-								id="confirmpassword"
-								name="confirmpassword"
-								className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
-							/>
-						</div>
-						<div>
+					<Formik
+						initialValues={initialValues}
+						validationSchema={validationSchema}
+						onSubmit={(value) => {
+							handleSubmit(value)
+						}}>
+						<Form className="space-y-4">
+							<div>
+								<label
+									htmlFor="email"
+									className="block text-sm font-medium text-gray-700">
+									Email
+								</label>
+								<Field
+									type="text"
+									id="email"
+									name="email"
+									className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+								/>
+								<ErrorMessage
+									name="email"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
+							<div>
+								<label
+									htmlFor="first_name"
+									className="block text-sm font-medium text-gray-700">
+									FirstName
+								</label>
+								<Field
+									type="text"
+									id="first_name"
+									name="first_name"
+									className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+								/>
+								<ErrorMessage
+									name="email"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
+							<div>
+								<label
+									htmlFor="last_name"
+									className="block text-sm font-medium text-gray-700">
+									LastName
+								</label>
+								<Field
+									type="text"
+									id="last_name"
+									name="last_name"
+									className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+								/>
+								<ErrorMessage
+									name="last_name"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
+							<div>
+								<label
+									htmlFor="password1"
+									className="block text-sm font-medium text-gray-700">
+									Password
+								</label>
+								<Field
+									type="password"
+									id="password1"
+									name="password1"
+									className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+								/>
+								<ErrorMessage
+									name="password1"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
+							<div>
+								<label
+									htmlFor="password2"
+									className="block text-sm font-medium text-gray-700">
+									Confirm Password
+								</label>
+								<Field
+									type="password"
+									id="password2"
+									name="password2"
+									className="mt-1 p-2 w-full border rounded-md focus:border-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-300 transition-colors duration-300"
+								/>
+								<ErrorMessage
+									name="password2"
+									component="div"
+									className="text-red-500 text-base text-center my-3"
+								/>
+							</div>
 							<button
 								type="submit"
 								className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300">
-								Sign In
+								Register
 							</button>
-						</div>
-					</form>
-					{/* <div className="mt-4 text-sm text-gray-600 text-center">
-                <p>
-                    Already have an account?{" "}
-                    <a href="#" className="text-black hover:underline">
-                        Login here
-                    </a>
-                </p>
-            </div> */}
+						</Form>
+					</Formik>
 				</div>
 			</div>
 		</main>

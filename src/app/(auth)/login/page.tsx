@@ -13,14 +13,7 @@ import {
 	setAccessToken,
 	clearAccessToken,
 } from "@/redux/features/token/tokenSlice";
-import {
-	addUser,
-	fetchUserProfile,
-} from "@/redux/features/userProfile/userProfileSlice";
-import {
-	selectAvatar,
-	selectBio,
-} from "@/redux/features/userProfile/userProfileSlice";
+import Link from "next/link";
 
 type ValueTypes = {
 	email: string;
@@ -70,6 +63,7 @@ export default function Login() {
 			.then((data) => {
 				console.log("Response data from login", data);
 				dispatch(setAccessToken(data.accessToken));
+				// localStorage.setItem("accessToken", data.accessToken);
 			})
 			.catch((error) => {
 				console.error("Error:", error);
@@ -79,12 +73,6 @@ export default function Login() {
 			router.push("/");
 		}
 	};
-
-	// fetching user profile
-	useEffect(() => {
-		dispatch(fetchUserProfile());
-	}, []);
-
 
 	return (
 		<main className="flex h-screen">
@@ -470,14 +458,15 @@ export default function Login() {
 							</button>
 						</Form>
 					</Formik>
-					{/* <div className="mt-4 text-sm text-gray-600 text-center">
+					<div className="mt-4 text-sm text-gray-600 text-center">
 						<p>
-							Already have an account?{" "}
-							<a href="#" className="text-black hover:underline">
-								Login here
-							</a>
+							<Link
+								href="/register"
+								className="w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300">
+								Register here
+							</Link>
 						</p>
-					</div> */}
+					</div>
 				</div>
 			</div>
 		</main>

@@ -23,9 +23,11 @@ export async function POST() {
 	// get the refresh token value
 	const refreshToken = credential.value;
 
+	console.log("Refesh token=====", refreshToken)
+
 	// if the refresh token is found, make a POST request to the Our API
 	const response = await fetch(
-		`${process.env.DJANGO_API_URL}/api/token/refresh/`,
+		`${process.env.NEXT_PUBLIC_DJANGO_API_URL}api/token/refresh/`,
 		{
 			method: "POST",
 			headers: { "Content-Type": "application/json" },

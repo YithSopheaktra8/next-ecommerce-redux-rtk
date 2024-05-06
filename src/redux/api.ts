@@ -7,13 +7,15 @@ const baseQuery = fetchBaseQuery({
 	baseUrl: process.env.NEXT_PUBLIC_DJANGO_API_URL,
 	prepareHeaders: (headers, { getState }) => {
 		const token = (getState() as RootState).accessToken.token;
-		console.log("token and baseQuery: ", token)
+		// const token = localStorage.getItem("accessToken");
+		console.log("token at baseQuery: ", token)
 		// if we have a token, let's set the authorization header
 		if (token) {
 			headers.set("authorization", `Bearer ${token}`);
 		}
 		return headers;
 	},
+	
 });
 
 const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
@@ -23,7 +25,7 @@ const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
 		const res = await fetch("http://localhost:3000/api/refresh", {
 			method: "POST",
 			credentials: "include",
-		});
+		})
 		if (res.ok) {
 			const data = await res.json();
 			api.dispatch(setAccessToken(data.accessToken));
@@ -43,6 +45,10 @@ const baseQueryWithReAuth = async (args: any, api: any, extraOptions: any) => {
 
 // initialize an empty api service that we'll inject endpoints into later as needed
 export const ecommerceApi = createApi({
+	refetchOnReconnect: true,
+	keepUnusedDataFor: 60,
+	refetchOnMountOrArgChange: 60,
+	tagTypes : ["Product", "ProductImage", "UserProfile"],
 	reducerPath: "ecommerceApi",
 	baseQuery: baseQueryWithReAuth,
 	endpoints: () => ({}),

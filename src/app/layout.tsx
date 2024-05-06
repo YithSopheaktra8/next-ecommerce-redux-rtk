@@ -7,7 +7,7 @@ import { roboto, suwannaphum } from "./font";
 import Footer from "@/components/Footer";
 import StoreProvider from "./storeProvider";
 import SessionWrapper from "./SessionWrapper";
-
+import { ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +29,7 @@ export default function RootLayout({
 						<Providers>
 							<Navbar />
 							{children}
+							<ToastContainer />
 							<Footer />
 						</Providers>
 					</StoreProvider>
